@@ -16,7 +16,7 @@ def send_price_alert(product_name, old_price, new_price, product_url):
     Product: {product_name}
     Old Price: ₦{old_price:,.2f}
     New Price: ₦{new_price:,.2f}
-    Savings: ₦{old_price - new_price:,.2f}
+    Savings: ₦{float(old_price) - float(new_price):,.2f}
     
     View Product: {product_url}
     """
