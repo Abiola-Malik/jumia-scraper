@@ -2,38 +2,45 @@ from os import getenv
 from utils.logger import logger
 
 from dotenv import load_dotenv
-import psycopg2
+import psycopg2.pool
 load_dotenv()
 
+pool = None
+ 
+def init_db_pool():
+    global pool
+    if pool is None:
+        dbname = getenv('dbname')
+        host = getenv('host')
+        user = getenv('user')
+        password = getenv('password')
+        port = getenv('port')
+        
+        logger.info(f"Initializing database connection pool: {dbname} at {host}:{port} as user {user}")
+        try:
+            pool = psycopg2.pool.SimpleConnectionPool(
+                minconn=1,
+                maxconn=20, 
+                dbname=dbname,
+                host=host,
+                user=user,
+                password=password,
+                port=port
+            )
+            logger.info("Database connection pool established successfully")
+        except Exception as e:
+            logger.critical(f"Error initializing database connection pool: {e}")
+            raise e
 
 def get_connection(): 
-    dbname = getenv('dbname')
-    host = getenv('host')
-    user = getenv('user')
-    password = getenv('password')
-    port = getenv('port')
-    
-    logger.info(f"Connecting to database: {dbname} at {host}:{port} as user {user}")
-    try:
-        conn = psycopg2.connect(
-            dbname=dbname,
-            host=host,
-            user=user,
-            password=password,
-            port=port
-        )
-        logger.info("Database connection established successfully")
-    except Exception as e:
-        logger.critical(f"Error connecting to database: {e}")
-        raise e
-    conn = psycopg2.connect(
-    dbname=dbname,
-    host=host,
-    user=user,
-    password=password,
-    port=port
-    )
-    return conn
+    if pool is None:
+        logger.error("Database connection pool is not initialized")
+        raise Exception("Database connection pool is not initialized")
+    return pool.getconn()
+
+def release_connection(conn):
+    pool.putconn(conn)
+
 
 def create_table():
     conn = get_connection()
@@ -62,5 +69,5 @@ def create_table():
     ''')
     conn.commit()
     cursor.close()
-    conn.close()
+    release_connection(conn)
     logger.info("Products table created or already exists")

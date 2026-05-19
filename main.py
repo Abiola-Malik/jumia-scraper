@@ -1,8 +1,9 @@
-from core.database import create_table
+from core.database import create_table, init_db_pool
 from core.scraper import Scraper
 from utils.logger import logger
 import schedule
 import time
+init_db_pool()
 create_table()
 
 

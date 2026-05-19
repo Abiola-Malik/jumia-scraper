@@ -1,4 +1,4 @@
-from core.database import get_connection
+from core.database import get_connection, release_connection
 from datetime import datetime
 import psycopg2.extras
 from utils.alerts import send_price_alert
@@ -11,7 +11,7 @@ def get_existing_product(product_url):
     result = cursor.fetchone()
     logger.info(f"Product found: {bool(result)}")
     cursor.close()
-    conn.close()
+    release_connection(conn)
     return result
 
 def insert_product(product):
@@ -73,7 +73,7 @@ def insert_product(product):
     ))
     conn.commit()
     cursor.close()
-    conn.close()
+    release_connection(conn)
     logger.info(f"Product processed: {product['product_url']}")
     
     
