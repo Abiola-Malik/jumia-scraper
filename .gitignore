@@ -8,3 +8,7 @@ __pycache__/
 .DS_Store
 .idea/
 .vscode/
+backup.sql
+.pytest_cache/
+dist/
+build/

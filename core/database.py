@@ -10,11 +10,11 @@ pool = None
 def init_db_pool():
     global pool
     if pool is None:
-        dbname = getenv('dbname')
-        host = getenv('host')
-        user = getenv('user')
-        password = getenv('password')
-        port = getenv('port')
+        dbname = getenv('POSTGRES_DB')
+        host = getenv('POSTGRES_HOST', 'db')
+        user = getenv('POSTGRES_USER')
+        password = getenv('POSTGRES_PASSWORD')
+        port = getenv('POSTGRES_PORT')
         
         logger.info(f"Initializing database connection pool: {dbname} at {host}:{port} as user {user}")
         try:
